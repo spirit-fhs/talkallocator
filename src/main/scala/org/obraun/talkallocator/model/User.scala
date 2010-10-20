@@ -35,6 +35,9 @@ package model
 
 import net.liftweb.mapper._
 import net.liftweb.common._
+import net.liftweb.http.S
+import net.liftweb.util.Helpers._
+import net.liftweb.util._
 
 class User extends MegaProtoUser[User] {
   def getSingleton = User
@@ -42,26 +45,58 @@ class User extends MegaProtoUser[User] {
 
 object User extends User with MetaMegaProtoUser[User] {
   override def dbTableName = "users"
-  override def screenWrap = Full(<lift:surround with="default" at="content">
-                               <lift:bind /></lift:surround>)
-  override def skipEmailValidation = true
 
-  def createExampleUsers() {
-    if (find(By(email, "admin@obraun.org")).isEmpty) {
-      create.email("admin@obraun.org")
-            .firstName("Hugo")
-            .lastName("Admin")
-            .password("talkadmin")
-            .superUser(true)
-            .validated(true).save
-    }
-    if (find(By(email, "user@obraun.org")).isEmpty) {
-      create.email("user@obraun.org")
-            .firstName("Egon")
-            .lastName("User")
-            .password("talkuser")
-            .validated(true).save
-    }
-  }
+  override def menus = sitemap
+  override lazy val sitemap = List(loginMenuLoc, logoutMenuLoc).flatten(a => a)
+
+  override def loginXhtml = {
+    (<lift:surround with="default" at ="content">
+      <form method="post" action={S.uri}>
+        <table>
+          <tr><td colspan="2">{S.??("log.in")}</td></tr>
+          <tr><td>{S.??("FHS-ID")}</td><td><user:user /></td></tr>
+          <tr><td>{S.??("password")}</td><td><user:password /></td></tr>
+          <td><user:submit /></td>
+        </table>
+      </form>
+     </lift:surround>)
+   }
+
+   override def login = {
+     if (S.post_?) {
+       if (S.param("username").open_!.equals("") || S.param("password").open_!.equals("")){
+        S.error("Errorcode: Bitte User und Pass angeben")
+        S.redirectTo("/user_mgt/login")
+       }
+       if(LDAPAuth.tryLogin(S.param("username").open_!,S.param("password").open_!)){
+          println("[LDAP] -----------------> Login Successfull!")
+          User.logUserIdIn(S.param("username").open_!)
+          if (User.find(By(firstName, S.param("username").open_!)).isEmpty) {
+            val thisUser = create
+            thisUser.email(S.getSessionAttribute("email").openOr("oops!"))
+            thisUser.firstName(S.param("username"))
+            thisUser.lastName(S.getSessionAttribute("fullname"))
+            if(S.param("username").open_! == "denison" || S.param("username").open_! == "braun3") {
+              thisUser.superUser(true)
+            }
+            thisUser.validated(true).save
+            println("User created....")
+            User.logUserIn(thisUser)
+          } else {
+            println(S.param("username").open_! + " has logged in before!")
+            User.logUserIn(User.find(By(firstName, S.param("username").open_!)).open_!)
+          }
+          S.notice("Login Successful as "+ S.getSessionAttribute("fullname").openOr("Go AWAY!"))
+          S.redirectTo("/index")
+       } else {
+        println("[LDAP] -----------------> Login not Successfull!")
+       }
+     }
+
+     bind("user", loginXhtml,
+          "user" -> ((<input type="text" name="username"/>)),
+          "password" -> (<input type="password" name="password"/>),
+          "submit" -> (<input type="submit" value={S.??("log.in")}/>))
+   }
 }
-// vim: set ts=2 sw=4 et:
+

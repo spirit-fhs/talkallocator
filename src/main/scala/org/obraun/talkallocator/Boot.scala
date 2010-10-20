@@ -47,7 +47,7 @@ class Boot extends Bootable {
     val vendor =
       new StandardDBVendor(
         "org.h2.Driver",
-        "jdbc:h2:talkallocator.db;AUTO_SERVER=TRUE",
+        "jdbc:h2:talkallocator;AUTO_SERVER=TRUE",
         Empty, Empty)
 
     LiftRules.unloadHooks.append(
@@ -69,10 +69,7 @@ class Boot extends Bootable {
       ) ::: User.sitemap
 
     LiftRules.setSiteMap(SiteMap(entries:_*))
-
-    User.createExampleUsers()
-    Talk.createExampleTalks()
-
+    
     LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
     LiftRules.loggedInTest = Full(() => User.loggedIn_?)
     S.addAround(DB.buildLoanWrapper)

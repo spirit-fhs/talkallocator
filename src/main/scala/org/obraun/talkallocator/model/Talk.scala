@@ -41,17 +41,9 @@ class Talk extends LongKeyedMapper[Talk] with IdPK {
   object title extends MappedString(this,100)
   object speaker extends MappedLongForeignKey(this, User)
 }
+
 object Talk extends Talk with LongKeyedMetaMapper[Talk] {
   override def dbTableName = "talks"
-  def createExampleTalks() = {
-    List(
-      "Scala 2.8.0 - Was gibt's Neues?",
-      "Scala - OSGi-Bundles from Outer (Java) Space"
-    ).foreach{
-      talk =>
-        if (find(By(title,talk)).isEmpty)
-          create.title(talk).save
-    }
-  }
+
 }
 // vim: set ts=2 sw=4 et:

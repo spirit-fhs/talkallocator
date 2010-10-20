@@ -54,8 +54,8 @@ object Talks {
     def speaker(speakerID: MappedLong[Talk]) = {
       val speaker = User.find(
         By(User.id,speakerID)
-      ).get
-      Text(speaker.firstName+" "+speaker.lastName)
+      ).getOrElse(User.getSingleton)
+      Text(speaker.lastName)
     }
 
     val talks = Talk.findAll(
