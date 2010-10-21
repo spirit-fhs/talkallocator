@@ -40,6 +40,7 @@ class Talk extends LongKeyedMapper[Talk] with IdPK {
   def getSingleton = Talk
   object title extends MappedString(this,100)
   object speaker extends MappedLongForeignKey(this, User)
+  
 }
 
 object Talk extends Talk with LongKeyedMetaMapper[Talk] {

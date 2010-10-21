@@ -41,6 +41,8 @@ import net.liftweb.util._
 
 class User extends MegaProtoUser[User] {
   def getSingleton = User
+  object fhsid extends MappedString(this,100)
+  object title extends MappedString(this,100)
 }
 
 object User extends User with MetaMegaProtoUser[User] {
@@ -74,8 +76,10 @@ object User extends User with MetaMegaProtoUser[User] {
           if (User.find(By(firstName, S.param("username").open_!)).isEmpty) {
             val thisUser = create
             thisUser.email(S.getSessionAttribute("email").openOr("oops!"))
-            thisUser.firstName(S.param("username"))
-            thisUser.lastName(S.getSessionAttribute("fullname"))
+            thisUser.fhsid(S.param("username"))
+            thisUser.title(S.getSessionAttribute("fullname").openOr("shit happens").split(" ")(0))
+            thisUser.firstName(S.getSessionAttribute("fullname").openOr("shit happens").split(" ")(1))
+            thisUser.lastName(S.getSessionAttribute("fullname").openOr("shit happens").split(" ")(2))
             if(S.param("username").open_! == "denison" || S.param("username").open_! == "braun3") {
               thisUser.superUser(true)
             }
@@ -84,7 +88,7 @@ object User extends User with MetaMegaProtoUser[User] {
             User.logUserIn(thisUser)
           } else {
             println(S.param("username").open_! + " has logged in before!")
-            User.logUserIn(User.find(By(firstName, S.param("username").open_!)).open_!)
+            User.logUserIn(User.find(By(fhsid, S.param("username").open_!)).open_!)
           }
           S.notice("Login Successful as "+ S.getSessionAttribute("fullname").openOr("Go AWAY!"))
           S.redirectTo("/index")

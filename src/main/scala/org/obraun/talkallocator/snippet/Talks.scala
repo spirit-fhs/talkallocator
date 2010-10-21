@@ -55,7 +55,7 @@ object Talks {
       val speaker = User.find(
         By(User.id,speakerID)
       ).getOrElse(User.getSingleton)
-      Text(speaker.lastName)
+      Text(speaker.title + " " + speaker.firstName + " " + speaker.lastName)
     }
 
     val talks = Talk.findAll(
