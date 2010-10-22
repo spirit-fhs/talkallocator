@@ -73,13 +73,13 @@ object User extends User with MetaMegaProtoUser[User] {
        if(LDAPAuth.tryLogin(S.param("username").open_!,S.param("password").open_!)){
           println("[LDAP] -----------------> Login Successfull!")
           User.logUserIdIn(S.param("username").open_!)
-          if (User.find(By(firstName, S.param("username").open_!)).isEmpty) {
+          if (User.find(By(fhsid, S.param("username").open_!)).isEmpty) {
             val thisUser = create
             thisUser.email(S.getSessionAttribute("email").openOr("oops!"))
             thisUser.fhsid(S.param("username"))
-            thisUser.title(S.getSessionAttribute("fullname").openOr("shit happens").split(" ")(0))
-            thisUser.firstName(S.getSessionAttribute("fullname").openOr("shit happens").split(" ")(1))
-            thisUser.lastName(S.getSessionAttribute("fullname").openOr("shit happens").split(" ")(2))
+            thisUser.title(S.getSessionAttribute("fullname").openOr("mr shit happens").split(" ")(0))
+            thisUser.firstName(S.getSessionAttribute("fullname").openOr("mr shit happens").split(" ")(1))
+            thisUser.lastName(S.getSessionAttribute("fullname").openOr("mr shit happens").split(" ")(2))
             if(S.param("username").open_! == "denison" || S.param("username").open_! == "braun3") {
               thisUser.superUser(true)
             }
