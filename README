@@ -4,6 +4,8 @@ http://www.hanser.de/buch.asp?isbn=978-3-446-42399-2&area=Computer
 In order to use it, you need the Simple Build Tool
 http://code.google.com/p/simple-build-tool/
 
+This is a fork and only works within the Network of the FhS. You will be able to run it, but only if you are student or worker you may log in! 
+
 Quickstart:
 
 $ sbt
@@ -11,7 +13,4 @@ $ sbt
 > jetty-run
 
 Then open http://localhost:8080/ in your favourite browser.
-
-Login as user user@obraun.org with password talkuser or
-as admin admin@obraun.org with password talkadmin.
 
