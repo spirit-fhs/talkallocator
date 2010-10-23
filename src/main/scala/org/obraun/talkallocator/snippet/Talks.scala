@@ -80,18 +80,23 @@ object Talks {
   }
 
   def add(html: NodeSeq) = {
+    var speakerCount = 0
     var title = ""
-    def addTalk(title: String) = {
-      if (title!="" &&
-          Talk.find(By(Talk.title,title)).isEmpty) {
-        Talk.create.title(title).save
+    def addTalk(title: String, speakerCount: Int) = {
+        for(i <- 1 to speakerCount) {
+          if (title!="" && Talk.find(By(Talk.title,title + " Nr." + i)).isEmpty) {          
+          Talk.create
+            .title(title + " Nr." + i.toString)
+            .save
+        }
       }
     }
     bind("talk",html,
       "title" -> text("",
                       t => title = t.trim),
+      "speakerCount" -> select((1 to 10).map(s => (s.toString,s.toString)).toSeq, Empty, x => speakerCount = x.toInt),
       "add" -> submit("Hinzufügen",
-                      () => addTalk(title))
+                      () => addTalk(title, speakerCount))
     )
   }
 
