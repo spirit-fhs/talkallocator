@@ -36,6 +36,7 @@ package model
 import net.liftweb.mapper._
 import net.liftweb.common._
 import net.liftweb.http.S
+import net.liftweb.http.SHtml._
 import net.liftweb.util.Helpers._
 import net.liftweb.util._
 
@@ -47,16 +48,17 @@ class User extends MegaProtoUser[User] {
 
 object User extends User with MetaMegaProtoUser[User] {
   override def dbTableName = "users"
-
   override def menus = sitemap
   override lazy val sitemap = List(loginMenuLoc, logoutMenuLoc).flatten(a => a)
+
+  private var ldapBase = ""
 
   override def loginXhtml = {
     (<lift:surround with="default" at ="content">
       <form method="post" action={S.uri}>
         <table>
           <tr><td colspan="2">{S.??("log.in")}</td></tr>
-          <tr><td>{S.??("FHS-ID")}</td><td><user:user /></td></tr>
+          <tr><td>{S.??("FHS-ID")}</td><td><user:user /></td><td><user:ldapBase /></td></tr>
           <tr><td>{S.??("password")}</td><td><user:password /></td></tr>
           <td><user:submit /></td>
         </table>
@@ -70,7 +72,7 @@ object User extends User with MetaMegaProtoUser[User] {
         S.error("Errorcode: Bitte User und Pass angeben")
         S.redirectTo("/user_mgt/login")
        }
-       if(LDAPAuth.tryLogin(S.param("username").open_!,S.param("password").open_!)){
+       if(LDAPAuth.tryLogin(S.param("username").open_!,S.param("password").open_!,ldapBase)){
           println("[LDAP] -----------------> Login Successfull!")
           User.logUserIdIn(S.param("username").open_!)
           if (User.find(By(fhsid, S.param("username").open_!)).isEmpty) {
@@ -100,6 +102,7 @@ object User extends User with MetaMegaProtoUser[User] {
      bind("user", loginXhtml,
           "user" -> ((<input type="text" name="username"/>)),
           "password" -> (<input type="password" name="password"/>),
+          "ldapBase" -> select(Seq(("ou=students,dc=fh-sm,dc=de", "Student"),("ou=people,dc=fh-sm,dc=de", "Mitarbeiter")),Empty, x => ldapBase = x),
           "submit" -> (<input type="submit" value={S.??("log.in")}/>))
    }
 }

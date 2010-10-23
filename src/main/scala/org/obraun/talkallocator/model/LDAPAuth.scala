@@ -52,13 +52,13 @@ object LDAPAuth {
     case _ => email
   }
 
-  def tryLogin(userName: String, passWord: String): Boolean = {
-    var base = ""
+  def tryLogin(userName: String, passWord: String, base: String): Boolean = {
+    /*var base = ""
     if(userName == "braun3"){
       base = "ou=people,dc=fh-sm,dc=de"
     } else {
       base = "ou=students,dc=fh-sm,dc=de"
-    }
+    }*/
     val dn = "uid=" + userName + "," + base
     val ldapURL = "ldaps://ldap1.fh-schmalkalden.de:636"
 
