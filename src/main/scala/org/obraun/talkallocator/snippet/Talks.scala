@@ -84,9 +84,9 @@ object Talks {
     var title = ""
     def addTalk(title: String, speakerCount: Int) = {
         for(i <- 1 to speakerCount) {
-          if (title!="" && Talk.find(By(Talk.title,title + " Nr." + i)).isEmpty) {          
+          if (title!="" && Talk.find(By(Talk.title,title + " Nr." + i)).isEmpty) {
           Talk.create
-            .title(title + " Nr." + i.toString)
+          .title(title + (if (speakerCount > 1) " Nr." + i.toString else ""))
             .save
         }
       }
